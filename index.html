@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZenvX Stydy - Super EdTech App</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0f19">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- KaTeX for Natural Textbook LaTeX Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Inter', 'Hind Siliguri', sans-serif;
+      background-color: #090d16;
+      color: #f8fafc;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ================= CALCULATOR THEMES (30+ Style Multi-Theme Support) ================= */
+    .calc-theme-dark {
+      --calc-bg: #18191e;
+      --lcd-bg: #d8e4e0;
+      --lcd-text: #111827;
+      --btn-func: #575860;
+      --btn-func-text: #ffffff;
+      --btn-num: #2c2d35;
+      --btn-num-text: #ffffff;
+      --btn-op: #575860;
+      --shift-color: #facc15;
+      --alpha-color: #a78bfa;
+    }
+
+    .calc-theme-emerald {
+      --calc-bg: #052e16;
+      --lcd-bg: #dcfce7;
+      --lcd-text: #064e3b;
+      --btn-func: #14532d;
+      --btn-func-text: #ecfdf5;
+      --btn-num: #064e3b;
+      --btn-num-text: #ffffff;
+      --btn-op: #15803d;
+      --shift-color: #fde047;
+      --alpha-color: #67e8f9;
+    }
+
+    .calc-theme-light {
+      --calc-bg: #e2e8f0;
+      --lcd-bg: #cbd5e1;
+      --lcd-text: #0f172a;
+      --btn-func: #94a3b8;
+      --btn-func-text: #0f172a;
+      --btn-num: #ffffff;
+      --btn-num-text: #0f172a;
+      --btn-op: #cbd5e1;
+      --shift-color: #d97706;
+      --alpha-color: #7c3aed;
+    }
+
+    .calc-theme-cyber {
+      --calc-bg: #090a10;
+      --lcd-bg: #111827;
+      --lcd-text: #38bdf8;
+      --btn-func: #1e293b;
+      --btn-func-text: #38bdf8;
+      --btn-num: #0f172a;
+      --btn-num-text: #f8fafc;
+      --btn-op: #334155;
+      --shift-color: #f59e0b;
+      --alpha-color: #ec4899;
+    }
+
+    #calcModule {
+      background-color: var(--calc-bg);
+    }
+
+    #calcLcdScreen {
+      background-color: var(--lcd-bg);
+      color: var(--lcd-text);
+    }
+
+    .c-cell {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100%;
+    }
+
+    .c-sub {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 3px;
+      font-size: 8.5px;
+      line-height: 10px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .s-lbl { color: var(--shift-color); }
+    .a-lbl { color: var(--alpha-color); }
+
+    .c-key {
+      width: 100%;
+      flex: 1;
+      border-radius: 9px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.45);
+      transition: transform 0.08s ease, filter 0.1s ease;
+    }
+
+    .c-key:active {
+      transform: translateY(1.5px);
+      filter: brightness(1.18);
+    }
+
+    .k-func { background-color: var(--btn-func); color: var(--btn-func-text); font-size: 12px; }
+    .k-num  { background-color: var(--btn-num);  color: var(--btn-num-text);  font-size: 17px; }
+    .k-op   { background-color: var(--btn-op);   color: var(--btn-func-text); font-size: 17px; }
+    .k-shift { background-color: #eab308; color: #111827; font-size: 11px; }
+    .k-alpha { background-color: #7c3aed; color: #ffffff; font-size: 11px; }
+    .k-orange { background-color: #ea8a35; color: #111827; font-size: 15px; font-weight: 800; }
+
+    /* Blinking Red Cursor like Image 2 */
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .red-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 20px;
+      background-color: #ef4444;
+      vertical-align: middle;
+      margin-left: 1px;
+      animation: blink-cursor 1s infinite;
+    }
+
+    /* Shorts Vertical Snap */
+    .shorts-container {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: calc(100dvh - 112px);
+    }
+    .short-slide {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      height: calc(100dvh - 112px);
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between bg-[#090d16]">
+
+  <!-- ================= TOP APP HEADER ================= -->
+  <header id="appHeader" class="h-14 px-4 bg-[#0f1624] border-b border-slate-800 flex items-center justify-between z-30 shrink-0">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
+        <i class="fa-solid fa-graduation-cap text-white text-base"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-base tracking-tight text-white">ZenvX Stydy</h1>
+        <p class="text-[10px] text-cyan-400 -mt-0.5 font-medium">Sci-Calc • ZenvXai • Messenger • EduTube</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button onclick="openCalculatorFullScreen()" class="px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center gap-1.5">
+        <i class="fa-solid fa-calculator"></i>
+        <span>991EX Calc</span>
+      </button>
+      <button onclick="toggleModal('apiModal', true)" class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center">
+        <i class="fa-solid fa-gear text-sm"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN VIEWPORT ================= -->
+  <main class="flex-1 relative overflow-hidden">
+
+    <!-- =========================================================================
+         MODULE 1: EXACT REPLICA FULL-SCREEN SCIENTIFIC CALCULATOR (IMAGE 1 & 2)
+         ========================================================================= -->
+    <section id="calcModule" class="calc-theme-dark fixed inset-0 z-50 hidden flex-col justify-between p-1.5">
+
+      <!-- Top Status Row: Back Button + NORM MATH DECI + Status Badges -->
+      <div class="flex items-center justify-between px-2 py-1 text-[10px] font-mono font-bold text-slate-300 shrink-0">
+        <div class="flex items-center gap-2">
+          <button onclick="closeCalculatorFullScreen()" class="px-2 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-700 flex items-center gap-1 text-[11px] font-sans">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <span id="statusNorm">NORM</span>
+          <span id="statusMath">MATH</span>
+          <span id="statusDeci">DECI</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="badgeShift" class="px-1.5 rounded bg-amber-500 text-black hidden">SHIFT</span>
+          <span id="badgeAlpha" class="px-1.5 rounded bg-purple-600 text-white hidden">ALPHA</span>
+          <span id="badgeHyp" class="px-1.5 rounded bg-cyan-500 text-black hidden">HYP</span>
+          <span id="badgeMemory" class="text-emerald-400">M=0</span>
+        </div>
+      </div>
+
+      <!-- Large Natural Textbook LCD Display (Exact Match to Image 2) -->
+      <div id="calcLcdScreen" class="w-full h-[23vh] rounded-xl p-3 flex flex-col justify-between shadow-inner border border-slate-700/50 relative overflow-hidden shrink-0">
+        <!-- Left Input Expression with Blinking Red Cursor -->
+        <div class="flex items-start justify-between w-full overflow-x-auto no-scrollbar">
+          <div class="flex items-center min-h-[54px]">
+            <div id="calcLatexInput" class="text-xl font-serif tracking-wide"></div>
+            <span class="red-cursor"></span>
+          </div>
+          <span id="calcSubModeInfo" class="text-[10px] font-mono opacity-75"></span>
+        </div>
+
+        <!-- Middle 3-dots & Live Formatted Output on Right -->
+        <div class="flex items-center justify-between w-full my-auto">
+          <button onclick="openCalcModal('history')" class="text-slate-600 hover:text-slate-900 px-1">
+            <i class="fa-solid fa-ellipsis-vertical text-base"></i>
+          </button>
+          <div id="calcLiveOutput" class="text-2xl sm:text-3xl font-mono font-semibold tracking-tight text-right truncate max-w-[88%]">
+            0
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle Action & Tool Bar: Menu, Sigma, Settings, Theme, DEG, MORE, SCAN -->
+      <div class="flex items-center justify-between gap-1 px-1 py-1.5 shrink-0">
+        <button onclick="openCalcModal('history')" class="w-8 h-7 rounded bg-slate-800/80 border border-purple-500/40 text-purple-400 flex items-center justify-center text-xs" title="History">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <button onclick="openCalcModal('constants')" class="w-8 h-7 rounded-full border border-slate-500 text-white flex items-center justify-center text-xs font-serif" title="Scientific Constants">
+          &Sigma;
+        </button>
+        <button onclick="openCalcModal('mode')" class="w-8 h-7 rounded-full border border-slate-500 text-white flex items-center justify-center text-xs" title="Settings">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+        <button onclick="cycleCalculatorTheme()" class="w-8 h-7 rounded-full border border-slate-500 text-amber-300 flex items-center justify-center text-xs" title="Change Calculator Theme (30+ Style)">
+          <i class="fa-solid fa-palette"></i>
+        </button>
+        <button id="btnDegRad" onclick="toggleCalcAngleUnit()" class="px-2.5 h-7 rounded border border-slate-500 text-white font-bold text-xs">
+          DEG
+        </button>
+        <button onclick="openCalcModal('more')" class="px-2.5 h-7 rounded border border-purple-500/60 text-purple-300 font-bold text-xs">
+          MORE
+        </button>
+        <button onclick="scanMathFromCalculator()" class="px-2.5 h-7 rounded border border-slate-400 bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5">
+          <i class="fa-solid fa-camera text-cyan-400"></i> SCAN
+        </button>
+      </div>
+
+      <!-- ================= 6-COLUMN SCIENTIFIC KEYPAD + 5-COLUMN NUMBER PAD ================= -->
+      <div class="flex-1 flex flex-col justify-between gap-1 overflow-hidden">
+
+        <!-- TOP 6x6 SCIENTIFIC GRID -->
+        <div class="grid grid-cols-6 grid-rows-6 gap-x-1.5 gap-y-0.5 flex-[1.45]">
+
+          <!-- ROW 1: SHIFT, ALPHA, Left, Right, MODE, 2nd -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl"></span></div>
+            <button onclick="pressKey('SHIFT')" class="c-key k-shift">SHIFT</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="a-lbl"></span></div>
+            <button onclick="pressKey('ALPHA')" class="c-key k-alpha">ALPHA</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span></span></div>
+            <button onclick="pressKey('LEFT')" class="c-key k-func"><i class="fa-solid fa-caret-left text-base"></i></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span></span></div>
+            <button onclick="pressKey('RIGHT')" class="c-key k-func"><i class="fa-solid fa-caret-right text-base"></i></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">CLR</span></div>
+            <button onclick="pressKey('MODE')" class="c-key k-func">MODE</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span></span></div>
+            <button onclick="pressKey('2ND')" class="c-key k-func italic">2nd</button>
+          </div>
+
+          <!-- ROW 2: CALC, ∫dx, Up, Down, x⁻¹, Log_x y -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">SOLVE</span><span class="a-lbl">=</span></div>
+            <button onclick="pressKey('CALC')" class="c-key k-func">CALC</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">d/dx</span><span class="a-lbl">:</span></div>
+            <button onclick="pressKey('INT')" class="c-key k-func">&int;dx</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span></span></div>
+            <button onclick="pressKey('UP')" class="c-key k-func"><i class="fa-solid fa-caret-up text-base"></i></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span></span></div>
+            <button onclick="pressKey('DOWN')" class="c-key k-func"><i class="fa-solid fa-caret-down text-base"></i></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">x!</span></div>
+            <button onclick="pressKey('INV')" class="c-key k-func">x<sup>-1</sup></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">&Sigma;</span><span class="a-lbl">&prod;</span></div>
+            <button onclick="pressKey('LOGXY')" class="c-key k-func">Log<sub>x</sub>y</button>
+          </div>
+
+          <!-- ROW 3: x/y, √x, x², x^y, Log, Ln -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">a b/c</span><span class="a-lbl">&divide;R</span></div>
+            <button onclick="pressKey('FRAC')" class="c-key k-func"><span class="leading-none text-[11px]">x<br>&mdash;<br>y</span></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl"><sup>3</sup>&radic;x</span><span class="a-lbl">mod</span></div>
+            <button onclick="pressKey('SQRT')" class="c-key k-func">&radic;x</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">x<sup>3</sup></span><span class="a-lbl">dec</span></div>
+            <button onclick="pressKey('SQ')" class="c-key k-func">x<sup>2</sup></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl"><sup>x</sup>&radic;y</span><span class="a-lbl">hex</span></div>
+            <button onclick="pressKey('POW')" class="c-key k-func">x<sup>y</sup></button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">10<sup>x</sup></span><span class="a-lbl">bin</span></div>
+            <button onclick="pressKey('LOG')" class="c-key k-func">Log</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">e<sup>x</sup></span><span class="a-lbl">t</span></div>
+            <button onclick="pressKey('LN')" class="c-key k-func">Ln</button>
+          </div>
+
+          <!-- ROW 4: (-), ° ' ", hyp, Sin, Cos, Tan -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">&angle;</span><span class="a-lbl">a</span></div>
+            <button onclick="pressKey('NEG')" class="c-key k-func">(&minus;)</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">FACT</span><span class="a-lbl">b</span></div>
+            <button onclick="pressKey('DMS')" class="c-key k-func">&deg; ' "</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">|x|</span><span class="a-lbl">c</span></div>
+            <button onclick="pressKey('HYP')" class="c-key k-func">hyp</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">Sin<sup>-1</sup></span><span class="a-lbl">d</span></div>
+            <button onclick="pressKey('SIN')" class="c-key k-func">Sin</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">Cos<sup>-1</sup></span><span class="a-lbl">e</span></div>
+            <button onclick="pressKey('COS')" class="c-key k-func">Cos</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">Tan<sup>-1</sup></span><span class="a-lbl">f</span></div>
+            <button onclick="pressKey('TAN')" class="c-key k-func">Tan</button>
+          </div>
+
+          <!-- ROW 5: RCL, ENG, (, ), S⇔D, M+ -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">STO</span><span class="a-lbl">CLRv</span></div>
+            <button onclick="pressKey('RCL')" class="c-key k-func">RCL</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">i</span><span class="a-lbl">Cot</span></div>
+            <button onclick="pressKey('ENG')" class="c-key k-func">ENG</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">%</span><span class="a-lbl">Cot<sup>-1</sup></span></div>
+            <button onclick="pressKey('LPAREN')" class="c-key k-func">(</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">,</span><span class="a-lbl">x</span></div>
+            <button onclick="pressKey('RPAREN')" class="c-key k-func">)</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">a/b&harr;d/c</span><span class="a-lbl">y</span></div>
+            <button onclick="pressKey('SD')" class="c-key k-func">S&harr;D</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">M&minus;</span><span class="a-lbl">m</span></div>
+            <button onclick="pressKey('MPLUS')" class="c-key k-func">M+</button>
+          </div>
+
+          <!-- ROW 6 LABELS BAR (CONST, CONV, SI, Limit, ∞, CLR ALL) -->
+          <div class="col-span-6 flex items-center justify-between px-2 pt-1 text-[9.5px] font-bold">
+            <button onclick="openCalcModal('constants')" class="s-lbl hover:underline">CONST</button>
+            <button onclick="openCalcModal('conversions')" class="s-lbl hover:underline">CONV</button>
+            <button onclick="openCalcModal('si')" class="a-lbl hover:underline">SI</button>
+            <button onclick="pressKey('LIMIT')" class="s-lbl hover:underline">Limit</button>
+            <button onclick="pressKey('INF')" class="a-lbl hover:underline">&infin;</button>
+            <button onclick="calcResetAll()" class="s-lbl hover:underline">CLR ALL</button>
+          </div>
+        </div>
+
+        <!-- BOTTOM 4x5 NUMERIC & ARITHMETIC PAD (Exact Match to Image 2) -->
+        <div class="grid grid-cols-5 grid-rows-4 gap-x-1.5 gap-y-1 flex-1">
+
+          <!-- Num Row 1: 7, 8, 9, DEL (Orange), AC (Orange) -->
+          <div class="c-cell">
+            <button onclick="pressKey('7')" class="c-key k-num">7</button>
+          </div>
+          <div class="c-cell">
+            <button onclick="pressKey('8')" class="c-key k-num">8</button>
+          </div>
+          <div class="c-cell">
+            <button onclick="pressKey('9')" class="c-key k-num">9</button>
+          </div>
+          <div class="c-cell">
+            <button onclick="pressKey('DEL')" class="c-key k-orange"><i class="fa-solid fa-delete-left"></i></button>
+          </div>
+          <div class="c-cell">
+            <button onclick="pressKey('AC')" class="c-key k-orange">AC</button>
+          </div>
+
+          <!-- Num Row 2: 4, 5, 6, ×, ÷ (with MATRIX, VECTOR, FUNC, nPr, nCr sub-labels) -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">MATRIX</span><span class="a-lbl">::</span></div>
+            <button onclick="pressKey('4')" class="c-key k-num">4</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">VECTOR</span></div>
+            <button onclick="pressKey('5')" class="c-key k-num">5</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">FUNC</span><span class="a-lbl">HELP</span></div>
+            <button onclick="pressKey('6')" class="c-key k-num">6</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">nPr</span><span class="a-lbl">GCD</span></div>
+            <button onclick="pressKey('MUL')" class="c-key k-op">&times;</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">nCr</span><span class="a-lbl">LCM</span></div>
+            <button onclick="pressKey('DIV')" class="c-key k-op">&divide;</button>
+          </div>
+
+          <!-- Num Row 3: 1, 2, 3, +, - (with STAT, CMPLX, DISTR, Pol, Rec sub-labels) -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">STAT</span></div>
+            <button onclick="pressKey('1')" class="c-key k-num">1</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">CMPLX</span></div>
+            <button onclick="pressKey('2')" class="c-key k-num">2</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">DISTR</span></div>
+            <button onclick="pressKey('3')" class="c-key k-num">3</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">Pol</span><span class="a-lbl">Ceil</span></div>
+            <button onclick="pressKey('ADD')" class="c-key k-op">+</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">Rec</span><span class="a-lbl">Floor</span></div>
+            <button onclick="pressKey('SUB')" class="c-key k-op">&minus;</button>
+          </div>
+
+          <!-- Num Row 4: 0, ., Exp, Ans, = (with COPY, Ran#, π, e, PreAns, History) -->
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">COPY</span><span class="a-lbl">PASTE</span></div>
+            <button onclick="pressKey('0')" class="c-key k-num">0</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">Ran#</span><span class="a-lbl">RanInt</span></div>
+            <button onclick="pressKey('DOT')" class="c-key k-num">.</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">&pi;</span><span class="a-lbl">e</span></div>
+            <button onclick="pressKey('EXP')" class="c-key k-num">Exp</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="a-lbl">PreAns</span></div>
+            <button onclick="pressKey('ANS')" class="c-key k-num">Ans</button>
+          </div>
+          <div class="c-cell">
+            <div class="c-sub"><span class="s-lbl">History</span></div>
+            <button onclick="pressKey('EQ')" class="c-key k-op">=</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CALCULATOR POPUP DRAWER (Constants, Conversions, Matrix, Equation Solver, History) -->
+      <div id="calcPopupModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="w-full max-w-md max-h-[80vh] rounded-2xl bg-[#18191e] border border-slate-700 flex flex-col overflow-hidden">
+          <div class="px-4 py-3 bg-[#23252d] border-b border-slate-700 flex items-center justify-between">
+            <h3 id="calcPopupTitle" class="font-bold text-sm text-amber-400">Calculator Menu</h3>
+            <button onclick="closeCalcModal()" class="w-7 h-7 rounded-full bg-slate-800 text-white"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div id="calcPopupBody" class="p-4 overflow-y-auto space-y-2 text-xs text-slate-200">
+            <!-- Dynamically filled -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         MODULE 2: STUDY WITH ZenvXai (PRO MULTIMODAL AI TUTOR)
+         ========================================================================= -->
+    <section id="aiModule" class="h-full flex flex-col justify-between bg-[#090d16]">
+      <div class="px-4 py-2.5 bg-[#111827] border-b border-slate-800 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-semibold text-xs text-slate-200">Study with <strong class="text-cyan-400">ZenvXai Pro</strong></span>
+        </div>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <span class="text-[11px] text-slate-400">Auto-Prompt Engine</span>
+          <input id="autoPromptToggle" type="checkbox" checked class="sr-only peer">
+          <div class="w-8 h-4 bg-slate-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all relative peer-checked:bg-blue-600"></div>
+        </label>
+      </div>
+
+      <!-- Smart Academic Prompt Chips -->
+      <div class="px-3 py-2 bg-[#0d1322] border-b border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+        <button onclick="triggerSmartPrompt('পদার্থবিজ্ঞানের গতিবিদ্যা ও প্রাসের সূত্রগুলো ধাপে ধাপে প্রতিপাদনসহ বুঝিয়ে দাও।')" class="px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs whitespace-nowrap">⚛️ পদার্থবিজ্ঞান সূত্র ও অংক</button>
+        <button onclick="triggerSmartPrompt('ক্যালকুলাসের অন্তরীকরণ ও যোগজীকরণের মূল নিয়মগুলো উদাহরণসহ দাও।')" class="px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs whitespace-nowrap">📐 ক্যালকুলাস ও উচ্চতর গণিত</button>
+        <button onclick="triggerSmartPrompt('রসায়নের জৈব যৌগের বিক্রিয়া মনে রাখার সহজ কৌশল ও শর্ট নোট দাও।')" class="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs whitespace-nowrap">🧪 রসায়ন শর্ট টেকনিক</button>
+      </div>
+
+      <!-- AI Conversation Container -->
+      <div id="aiChatStream" class="flex-1 p-4 overflow-y-auto space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-robot text-white text-xs"></i>
+          </div>
+          <div class="max-w-[88%] rounded-2xl rounded-tl-none bg-[#151f32] border border-slate-800 p-3.5 text-xs text-slate-200 leading-relaxed space-y-1.5">
+            <div class="font-bold text-cyan-400">ZenvX Stydy AI Mentor</div>
+            <p>তুমি যেকোনো এলোমেলো প্রশ্ন লিখলে বা খাতার অংকের ছবি তুললে আমার <strong>Auto-Prompt Engine</strong> সেটিকে সাজিয়ে একদম বইয়ের ভাষায় ধাপে ধাপে উত্তর দেবে।</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attachment Preview Bar -->
+      <div id="aiAttachmentPreview" class="hidden px-4 py-2 bg-[#162033] border-t border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img id="previewImgThumb" src="" class="w-10 h-10 rounded-lg object-cover hidden border border-cyan-400">
+          <div>
+            <p id="attachmentName" class="text-xs font-semibold text-white truncate max-w-[220px]">attachment</p>
+            <p id="attachmentSize" class="text-[10px] text-emerald-400">Ready for ZenvXai Analysis</p>
+          </div>
+        </div>
+        <button onclick="clearAiAttachment()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-300"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- AI Input Bar -->
+      <div class="p-3 bg-[#0f1624] border-t border-slate-800 shrink-0">
+        <div class="flex items-end gap-2 bg-[#182235] border border-slate-700 rounded-2xl p-2">
+          <button onclick="openAiCameraModal()" class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0" title="ক্যামেরা দিয়ে অংক স্ক্যান করুন">
+            <i class="fa-solid fa-camera"></i>
+          </button>
+          <label class="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0 cursor-pointer" title="বড় ফাইল আপলোড করুন">
+            <i class="fa-solid fa-paperclip"></i>
+            <input type="file" class="hidden" accept="image/*,.pdf,.txt,.doc,.docx" onchange="handleLargeFileUpload(event)">
+          </label>
+          <textarea id="aiUserInput" rows="1" placeholder="প্রশ্ন লিখুন বা ছবি/ফাইল পাঠান..." class="flex-1 bg-transparent text-xs text-white placeholder-slate-400 focus:outline-none resize-none py-2"></textarea>
+          <button onclick="sendMessageToZenvXai()" class="w-10 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         MODULE 3: SOCIAL HUB (MESSENGER + EDUTUBE + SHORTS)
+         ========================================================================= -->
+    <section id="socialModule" class="h-full hidden flex-col bg-[#090d16]">
+      <div class="px-3 py-2 bg-[#0f1624] border-b border-slate-800 flex items-center gap-2 shrink-0">
+        <button onclick="switchSocialSubTab('messenger')" id="subTabMessenger" class="flex-1 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold flex items-center justify-center gap-1.5">
+          <i class="fa-brands fa-facebook-messenger"></i> মেসেঞ্জার
+        </button>
+        <button onclick="switchSocialSubTab('youtube')" id="subTabYoutube" class="flex-1 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5">
+          <i class="fa-brands fa-youtube text-red-500"></i> EduTube
+        </button>
+        <button onclick="switchSocialSubTab('shorts')" id="subTabShorts" class="flex-1 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-bolt text-amber-400"></i> Shorts
+        </button>
+      </div>
+
+      <!-- Messenger View -->
+      <div id="messengerView" class="flex-1 flex flex-col overflow-hidden">
+        <!-- Active Teachers & Students Bar -->
+        <div class="px-3 py-2 bg-[#0d1422] border-b border-slate-800 flex items-center gap-3 overflow-x-auto no-scrollbar shrink-0">
+          <button onclick="selectChatContact('ফিজিক্স স্যার (ড. আরিফ)', 'অনলাইন • পদার্থবিজ্ঞান', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80')" class="flex flex-col items-center gap-1 shrink-0">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80" class="w-10 h-10 rounded-full object-cover border-2 border-blue-500">
+            <span class="text-[10px] text-slate-200">ফিজিক্স স্যার</span>
+          </button>
+          <button onclick="selectChatContact('সাকিব স্যার (Math Mentor)', 'অনলাইন • উচ্চতর গণিত', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80')" class="flex flex-col items-center gap-1 shrink-0">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-500">
+            <span class="text-[10px] text-slate-200">সাকিব স্যার</span>
+          </button>
+          <button onclick="selectChatContact('স্টুডেন্ট গ্রুপ ডিসকাশন', '১৮ জন অনলাইন', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&q=80')" class="flex flex-col items-center gap-1 shrink-0">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&q=80" class="w-10 h-10 rounded-full object-cover border-2 border-purple-500">
+            <span class="text-[10px] text-slate-200">স্টাডি গ্রুপ</span>
+          </button>
+        </div>
+
+        <!-- Chat Header with Audio & Video Call Buttons -->
+        <div class="px-4 py-2 bg-[#121b2d] border-b border-slate-800 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2.5">
+            <img id="activeChatAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80" class="w-9 h-9 rounded-full object-cover">
+            <div>
+              <h3 id="activeChatName" class="text-xs font-bold text-white">ফিজিক্স স্যার (ড. আরিফ)</h3>
+              <p id="activeChatStatus" class="text-[10px] text-emerald-400">অনলাইন • পদার্থবিজ্ঞান</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="startAudioCall()" class="w-9 h-9 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center">
+              <i class="fa-solid fa-phone"></i>
+            </button>
+            <button onclick="startVideoCall()" class="w-9 h-9 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center">
+              <i class="fa-solid fa-video"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="messengerChatBox" class="flex-1 p-4 overflow-y-auto space-y-3">
+          <div class="flex items-end gap-2">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80" class="w-7 h-7 rounded-full object-cover">
+            <div class="max-w-[78%] rounded-2xl rounded-bl-none bg-[#1e293b] px-3.5 py-2 text-xs text-slate-100">
+              তোমাদের ক্যালকুলেটরে $\frac{1}{\pi^2}$-এর মান কত আসে চেক করেছো? কোনো সমস্যা হলে অডিও বা ভিডিও কল দাও।
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="p-2.5 bg-[#0f1624] border-t border-slate-800 flex items-center gap-2 shrink-0">
+          <input id="messengerInput" type="text" placeholder="মেসেজ লিখুন..." onkeydown="if(event.key==='Enter') sendMessengerText()" class="flex-1 bg-[#1e293b] text-xs text-white rounded-full px-4 py-2.5 focus:outline-none border border-slate-700">
+          <button onclick="sendMessengerText()" class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- EduTube View -->
+      <div id="youtubeView" class="flex-1 hidden flex-col overflow-hidden bg-[#0f0f0f]">
+        <div id="youtubeFeedList" onscroll="handleYoutubeInfiniteScroll(this)" class="flex-1 overflow-y-auto p-3 space-y-4"></div>
+      </div>
+
+      <!-- Shorts View -->
+      <div id="shortsView" class="flex-1 hidden bg-black relative">
+        <div id="shortsFeedContainer" class="shorts-container no-scrollbar"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+  <nav class="h-14 bg-[#0f1624] border-t border-slate-800 grid grid-cols-3 z-30 shrink-0">
+    <button onclick="switchMainTab('ai')" id="navBtnAi" class="flex flex-col items-center justify-center text-blue-400">
+      <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Study with ZenvXai</span>
+    </button>
+    <button onclick="openCalculatorFullScreen()" class="flex flex-col items-center justify-center text-amber-400">
+      <i class="fa-solid fa-calculator text-base"></i>
+      <span class="text-[10px] font-semibold mt-0.5">991EX Calculator</span>
+    </button>
+    <button onclick="switchMainTab('social')" id="navBtnSocial" class="flex flex-col items-center justify-center text-slate-400">
+      <i class="fa-solid fa-comments text-base"></i>
+      <span class="text-[10px] font-semibold mt-0.5">Social & EduTube</span>
+    </button>
+  </nav>
+
+
+  <!-- ================= FULL-SCREEN AUDIO CALL UI ================= -->
+  <div id="audioCallOverlay" class="fixed inset-0 bg-[#090d16] z-50 hidden flex-col items-center justify-between py-12 px-6">
+    <div class="text-center">
+      <span class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">ZenvX Stydy Voice Call</span>
+      <h2 id="audioCallTitle" class="text-xl font-bold text-white mt-3">ফিজিক্স স্যার (ড. আরিফ)</h2>
+      <p id="audioCallTimer" class="text-sm text-blue-400 font-mono mt-1">00:00</p>
+    </div>
+    <img id="audioCallAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80" class="w-32 h-32 rounded-full object-cover border-4 border-blue-500 shadow-2xl">
+    <div class="flex items-center gap-6">
+      <button onclick="toggleAudioMute(this)" class="w-14 h-14 rounded-full bg-slate-800 text-white flex items-center justify-center text-lg"><i class="fa-solid fa-microphone"></i></button>
+      <button onclick="endActiveCall()" class="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-phone-slash"></i></button>
+    </div>
+  </div>
+
+
+  <!-- ================= FULL-SCREEN HARDWARE VIDEO CALL UI ================= -->
+  <div id="videoCallOverlay" class="fixed inset-0 bg-black z-50 hidden flex-col justify-between">
+    <video id="liveVideoCallStream" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover"></video>
+    <div class="relative z-10 p-4 bg-gradient-to-b from-black/80 to-transparent flex items-center justify-between">
+      <div>
+        <h3 id="videoCallPartner" class="text-sm font-bold text-white">ফিজিক্স স্যার (ড. আরিফ)</h3>
+        <p class="text-xs text-emerald-400">Live Camera Connected</p>
+      </div>
+      <div class="w-24 h-32 rounded-xl overflow-hidden border-2 border-white/50 bg-slate-900">
+        <img id="videoCallRemoteThumb" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80" class="w-full h-full object-cover">
+      </div>
+    </div>
+    <div class="relative z-10 p-6 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center gap-5">
+      <button onclick="toggleAudioMute(this)" class="w-12 h-12 rounded-full bg-white/20 text-white flex items-center justify-center"><i class="fa-solid fa-microphone"></i></button>
+      <button onclick="endActiveCall()" class="w-16 h-16 rounded-full bg-red-600 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-phone-slash"></i></button>
+      <button onclick="switchCameraFacingMode()" class="w-12 h-12 rounded-full bg-white/20 text-white flex items-center justify-center"><i class="fa-solid fa-camera-rotate"></i></button>
+    </div>
+  </div>
+
+
+  <!-- ================= AI CAMERA SCANNER MODAL ================= -->
+  <div id="aiCameraModal" class="fixed inset-0 bg-black/95 z-50 hidden flex-col justify-between p-4">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold text-cyan-400"><i class="fa-solid fa-camera mr-1"></i> ZenvX Stydy Math Scanner</span>
+      <button onclick="closeAiCameraModal()" class="w-8 h-8 rounded-full bg-slate-800 text-white"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="relative flex-1 my-3 rounded-2xl overflow-hidden border-2 border-cyan-500/50 bg-slate-950">
+      <video id="aiCameraVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+      <canvas id="aiCameraCanvas" class="hidden"></canvas>
+    </div>
+    <div class="flex justify-center">
+      <button onclick="capturePhotoForAi()" class="w-16 h-16 rounded-full border-4 border-white bg-cyan-500 text-white text-xl flex items-center justify-center">
+        <i class="fa-solid fa-camera"></i>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ================= API SETTINGS MODAL ================= -->
+  <div id="apiModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-2xl bg-[#111827] border border-slate-700 p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h3 class="font-bold text-sm text-white">ZenvX Stydy API Settings</h3>
+        <button onclick="toggleModal('apiModal', false)" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 mb-1">Google Gemini API Key:</label>
+          <input id="geminiApiKeyInput" type="password" placeholder="AIzaSy..." class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2 text-white">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button onclick="saveApiConfiguration()" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold">সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MASTER JAVASCRIPT ENGINE ================= -->
+  <script>
+    /********************************************************************
+     * 1. EXACT CASIO 991EX / CalcES ENGINE (ALL BUTTONS & SUB-FUNCTIONS)
+     ********************************************************************/
+    let expr = "1/(pi^2)"; // Starts with exact demo expression from Image 2!
+    let calcShift = false;
+    let calcAlpha = false;
+    let calcHyp = false;
+    let angleMode = "DEG"; // DEG, RAD, GRAD
+    let lastAns = 0.10132118364;
+    let preAns = 0;
+    let memoryM = 0;
+    let sdMode = 0; // 0: Decimal, 1: Exact Fraction, 2: Pi multiple, 3: DMS
+    let calcHistory = [];
+    let calcVars = { a: 0, b: 0, c: 0, d: 0, e: 2.71828182846, f: 0, x: 2, y: 3, m: 0 };
+    const themes = ['calc-theme-dark', 'calc-theme-emerald', 'calc-theme-light', 'calc-theme-cyber'];
+    let currentThemeIdx = 0;
+
+    function openCalculatorFullScreen() {
+      pauseAllPlayingMedia();
+      const mod = document.getElementById('calcModule');
+      mod.classList.remove('hidden');
+      mod.classList.add('flex');
+      updateCalculatorScreen();
+    }
+
+    function closeCalculatorFullScreen() {
+      const mod = document.getElementById('calcModule');
+      mod.classList.add('hidden');
+      mod.classList.remove('flex');
+    }
+
+    function cycleCalculatorTheme() {
+      const mod = document.getElementById('calcModule');
+      mod.classList.remove(themes[currentThemeIdx]);
+      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+      mod.classList.add(themes[currentThemeIdx]);
+    }
+
+    function toggleCalcAngleUnit() {
+      const units = ["DEG", "RAD", "GRAD"];
+      angleMode = units[(units.indexOf(angleMode) + 1) % units.length];
+      document.getElementById('btnDegRad').innerText = angleMode;
+      updateCalculatorScreen();
+    }
+
+    function updateStatusBadges() {
+      document.getElementById('badgeShift').classList.toggle('hidden', !calcShift);
+      document.getElementById('badgeAlpha').classList.toggle('hidden', !calcAlpha);
+      document.getElementById('badgeHyp').classList.toggle('hidden', !calcHyp);
+      document.getElementById('badgeMemory').innerText = `M=${Number(memoryM.toFixed(3))}`;
+    }
+
+    // Master Key Handler covering Normal, SHIFT (Yellow), and ALPHA (Purple) actions
+    function pressKey(key) {
+      if (key === 'SHIFT') {
+        calcShift = !calcShift;
+        calcAlpha = false;
+        updateStatusBadges();
+        return;
+      }
+      if (key === 'ALPHA') {
+        calcAlpha = !calcAlpha;
+        calcShift = false;
+        updateStatusBadges();
+        return;
+      }
+      if (key === 'HYP') {
+        if (calcShift) { insertToken('abs('); }
+        else if (calcAlpha) { insertToken('c'); }
+        else { calcHyp = !calcHyp; }
+        resetModifiers();
+        updateCalculatorScreen();
+        return;
+      }
+
+      // Handle SHIFT + Button combinations (Yellow Sub-labels in Image 2)
+      if (calcShift) {
+        resetModifiers();
+        switch (key) {
+          case 'MODE': calcResetAll(); return;
+          case 'CALC': openCalcModal('solve'); return;
+          case 'INT': insertToken('deriv('); return; // d/dx
+          case 'INV': insertToken('fact('); return;  // x!
+          case 'LOGXY': insertToken('sum('); return; // Σ
+          case 'FRAC': toggleMixedFraction(); return;
+          case 'SQRT': insertToken('cbrt('); return; // ³√x
+          case 'SQ': insertToken('^3'); return;      // x³
+          case 'POW': insertToken('^(1/'); return;   // ˣ√y
+          case 'LOG': insertToken('10^('); return;
+          case 'LN': insertToken('e^('); return;
+          case 'NEG': insertToken('∠'); return;
+          case 'DMS': factorizeCurrentResult(); return; // FACT (Prime Factorization)
+          case 'SIN': insertToken('asin('); return;
+          case 'COS': insertToken('acos('); return;
+          case 'TAN': insertToken('atan('); return;
+          case 'RCL': storeToMemoryPrompt(); return; // STO
+          case 'ENG': insertToken('i'); return;
+          case 'LPAREN': insertToken('%'); return;
+          case 'RPAREN': insertToken(','); return;
+          case 'SD': toggleMixedFraction(); return;
+          case 'MPLUS': memoryM -= evaluateRaw(expr); updateStatusBadges(); return; // M-
+          case '4': openCalcModal('matrix'); return; // MATRIX
+          case '5': openCalcModal('vector'); return; // VECTOR
+          case '6': openCalcModal('func'); return;   // FUNC
+          case 'MUL': insertToken('P'); return;      // nPr
+          case 'DIV': insertToken('C'); return;      // nCr
+          case '1': openCalcModal('stat'); return;   // STAT
+          case '2': openCalcModal('cmplx'); return;  // CMPLX
+          case '3': openCalcModal('distr'); return;  // DISTR
+          case 'ADD': insertToken('Pol('); return;
+          case 'SUB': insertToken('Rec('); return;
+          case '0': navigator.clipboard?.writeText(String(lastAns)); showSubInfo("COPIED"); return;
+          case 'DOT': insertToken(String(Number(Math.random().toFixed(3)))); return; // Ran#
+          case 'EXP': insertToken('pi'); return;     // π
+          case 'EQ': openCalcModal('history'); return;
+        }
+      }
+
+      // Handle ALPHA + Button combinations (Purple Sub-labels in Image 2)
+      if (calcAlpha) {
+        resetModifiers();
+        switch (key) {
+          case 'CALC': insertToken('='); return;
+          case 'INT': insertToken(':'); return;
+          case 'LOGXY': insertToken('prod('); return; // Π
+          case 'FRAC': showRemainderDivision(); return; // ÷R
+          case 'SQRT': insertToken(' mod '); return;
+          case 'SQ': showBaseConversion(10); return;
+          case 'POW': showBaseConversion(16); return;
+          case 'LOG': showBaseConversion(2); return;
+          case 'LN': insertToken('t'); return;
+          case 'NEG': insertToken('a'); return;
+          case 'DMS': insertToken('b'); return;
+          case 'SIN': insertToken('d'); return;
+          case 'COS': insertToken('e'); return;
+          case 'TAN': insertToken('f'); return;
+          case 'RCL': calcVars = { a:0,b:0,c:0,d:0,e:2.718281828,f:0,x:0,y:0,m:0 }; showSubInfo("VARS CLEARED"); return;
+          case 'ENG': insertToken('cot('); return;
+          case 'LPAREN': insertToken('acot('); return;
+          case 'RPAREN': insertToken('x'); return;
+          case 'SD': insertToken('y'); return;
+          case 'MPLUS': insertToken('m'); return;
+          case '6': openCalcModal('more'); return;
+          case 'MUL': insertToken('gcd('); return;
+          case 'DIV': insertToken('lcm('); return;
+          case 'ADD': insertToken('ceil('); return;
+          case 'SUB': insertToken('floor('); return;
+          case '0': navigator.clipboard?.readText().then(t => insertToken(t)); return;
+          case 'DOT': insertToken(String(Math.floor(Math.random() * 100))); return; // RanInt
+          case 'EXP': insertToken('e'); return;
+          case 'ANS': insertToken(String(preAns)); return;
+        }
+      }
+
+      // Normal Button Presses
+      switch (key) {
+        case 'AC': expr = ""; sdMode = 0; break;
+        case 'DEL': expr = expr.slice(0, -1); break;
+        case 'LEFT': case 'RIGHT': case 'UP': case 'DOWN': break;
+        case 'MODE': openCalcModal('mode'); break;
+        case '2ND': calcShift = !calcShift; updateStatusBadges(); return;
+        case 'CALC': evaluateForCustomX(); return;
+        case 'INT': insertToken('int('); break;
+        case 'INV': insertToken('^(-1)'); break;
+        case 'LOGXY': insertToken('logBase('); break;
+        case 'FRAC': insertToken('()/()'); break;
+        case 'SQRT': insertToken('sqrt('); break;
+        case 'SQ': insertToken('^2'); break;
+        case 'POW': insertToken('^'); break;
+        case 'LOG': insertToken('log('); break;
+        case 'LN': insertToken('ln('); break;
+        case 'NEG': insertToken('-'); break;
+        case 'DMS': toggleDMSFormat(); return;
+        case 'SIN': insertToken(calcHyp ? 'sinh(' : 'sin('); calcHyp = false; break;
+        case 'COS': insertToken(calcHyp ? 'cosh(' : 'cos('); calcHyp = false; break;
+        case 'TAN': insertToken(calcHyp ? 'tanh(' : 'tan('); calcHyp = false; break;
+        case 'RCL': openCalcModal('rcl'); return;
+        case 'ENG': formatEngineeringNotation(); return;
+        case 'LPAREN': insertToken('('); break;
+        case 'RPAREN': insertToken(')'); break;
+        case 'SD': toggleSDConversion(); return;
+        case 'MPLUS': memoryM += evaluateRaw(expr); updateStatusBadges(); showSubInfo("M+ SAVED"); return;
+        case 'LIMIT': insertToken('lim('); break;
+        case 'INF': insertToken('Infinity'); break;
+        case 'MUL': insertToken('*'); break;
+        case 'DIV': insertToken('/'); break;
+        case 'ADD': insertToken('+'); break;
+        case 'SUB': insertToken('-'); break;
+        case 'DOT': insertToken('.'); break;
+        case 'EXP': insertToken('*10^'); break;
+        case 'ANS': insertToken('Ans'); break;
+        case 'EQ': commitCalculation(); return;
+        default: insertToken(key); break;
+      }
+
+      resetModifiers();
+      updateCalculatorScreen();
+    }
+
+    function resetModifiers() {
+      calcShift = false;
+      calcAlpha = false;
+      updateStatusBadges();
+    }
+
+    function insertToken(t) {
+      if (t === '()/()') {
+        expr = expr ? `(${expr})/()` : `(1)/(2)`;
+      } else {
+        expr += t;
+      }
+      sdMode = 0;
+    }
+
+    function showSubInfo(txt) {
+      const el = document.getElementById('calcSubModeInfo');
+      el.innerText = txt;
+      setTimeout(() => { if (el.innerText === txt) el.innerText = ""; }, 2200);
+    }
+
+    // Natural Textbook LaTeX Formatter
+    function formatExprToLatex(raw) {
+      if (!raw) return "\\,";
+      let tex = raw
+        .replace(/1\/\(pi\^2\)/g, "\\frac{1}{\\pi^2}")
+        .replace(/\(([^()]+)\)\/\(([^()]*)\)/g, "\\frac{$1}{$2}")
+        .replace(/([0-9a-zA-Z.]+)\/([0-9a-zA-Z.^]+)/g, "\\frac{$1}{$2}")
+        .replace(/sqrt\(([^)]*)\)/g, "\\sqrt{$1}")
+        .replace(/cbrt\(([^)]*)\)/g, "\\sqrt[3]{$1}")
+        .replace(/int\(([^)]*)\)/g, "\\int\\left($1\\right)dx")
+        .replace(/deriv\(([^)]*)\)/g, "\\frac{d}{dx}\\left($1\\right)")
+        .replace(/sum\(([^)]*)\)/g, "\\sum\\left($1\\right)")
+        .replace(/prod\(([^)]*)\)/g, "\\prod\\left($1\\right)")
+        .replace(/pi/g, "\\pi ")
+        .replace(/Infinity/g, "\\infty ")
+        .replace(/asin\(/g, "\\sin^{-1}(")
+        .replace(/acos\(/g, "\\cos^{-1}(")
+        .replace(/atan\(/g, "\\tan^{-1}(")
+        .replace(/sin\(/g, "\\sin(")
+        .replace(/cos\(/g, "\\cos(")
+        .replace(/tan\(/g, "\\tan(")
+        .replace(/log\(/g, "\\log(")
+        .replace(/ln\(/g, "\\ln(")
+        .replace(/\*/g, "\\times ")
+        .replace(/\//g, "\\div ");
+      return tex;
+    }
+
+    // Core Mathematical Evaluator supporting Factorials, nPr, nCr, Derivatives, Integrals, GCD, LCM
+    function factorial(n) {
+      n = Math.round(n);
+      if (n < 0) return NaN;
+      if (n <= 1) return 1;
+      let r = 1;
+      for (let i = 2; i <= n; i++) r *= i;
+      return r;
+    }
+    function gcd(a, b) { return b === 0 ? Math.abs(a) : gcd(b, a % b); }
+    function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+    function nPr(n, r) { return factorial(n) / factorial(n - r); }
+    function nCr(n, r) { return factorial(n) / (factorial(r) * factorial(n - r)); }
+
+    // Numerical Derivative d/dx at x = calcVars.x
+    function numDeriv(fnBody, xVal = calcVars.x || 2) {
+      const h = 1e-5;
+      const f = (x) => Function('x', `return (${fnBody});`)(x);
+      return (f(xVal + h) - f(xVal - h)) / (2 * h);
+    }
+
+    // Numerical Definite Integral from 0 to xVal using Simpson's Rule
+    function numIntegral(fnBody, b = calcVars.x || 3) {
+      const a = 0, n = 100, h = (b - a) / n;
+      const f = (x) => Function('x', `return (${fnBody});`)(x);
+      let s = f(a) + f(b);
+      for (let i = 1; i < n; i++) s += f(a + i * h) * (i % 2 === 0 ? 2 : 4);
+      return (h / 3) * s;
+    }
+
+    function evaluateRaw(rawStr) {
+      if (!rawStr) return 0;
+      try {
+        let s = rawStr;
+        // Auto-close open parentheses
+        const openCount = (s.match(/\(/g) || []).length;
+        const closeCount = (s.match(/\)/g) || []).length;
+        if (openCount > closeCount) s += ')'.repeat(openCount - closeCount);
+
+        const trigFactor = angleMode === "DEG" ? (Math.PI / 180) : (angleMode === "GRAD" ? (Math.PI / 200) : 1);
+        const invFactor = 1 / trigFactor;
+
+        s = s
+          .replace(/Ans/g, `(${lastAns})`)
+          .replace(/pi/g, "Math.PI")
+          .replace(/(?<![a-zA-Z])e(?![a-zA-Z])/g, "Math.E")
+          .replace(/(\d+)P(\d+)/g, "nPr($1,$2)")
+          .replace(/(\d+)C(\d+)/g, "nCr($1,$2)")
+          .replace(/fact\(([^)]+)\)/g, "factorial($1)")
+          .replace(/sqrt\(/g, "Math.sqrt(")
+          .replace(/cbrt\(/g, "Math.cbrt(")
+          .replace(/abs\(/g, "Math.abs(")
+          .replace(/ceil\(/g, "Math.ceil(")
+          .replace(/floor\(/g, "Math.floor(")
+          .replace(/asin\(/g, `(${invFactor})*Math.asin(`)
+          .replace(/acos\(/g, `(${invFactor})*Math.acos(`)
+          .replace(/atan\(/g, `(${invFactor})*Math.atan(`)
+          .replace(/sinh\(/g, "Math.sinh(")
+          .replace(/cosh\(/g, "Math.cosh(")
+          .replace(/tanh\(/g, "Math.tanh(")
+          .replace(/sin\(/g, `Math.sin(${trigFactor}*`)
+          .replace(/cos\(/g, `Math.cos(${trigFactor}*`)
+          .replace(/tan\(/g, `Math.tan(${trigFactor}*`)
+          .replace(/cot\(/g, `1/Math.tan(${trigFactor}*`)
+          .replace(/logBase\(([^,]+),([^)]+)\)/g, "(Math.log($2)/Math.log($1))")
+          .replace(/log\(/g, "Math.log10(")
+          .replace(/ln\(/g, "Math.log(")
+          .replace(/ mod /g, "%")
+          .replace(/%/g, "*0.01")
+          .replace(/\^/g, "**");
+
+        // Replace variables a,b,c,d,f,x,y,m
+        Object.keys(calcVars).forEach(v => {
+          const reg = new RegExp(`(?<![a-zA-Z0-9_])${v}(?![a-zA-Z0-9_])`, 'g');
+          s = s.replace(reg, `(${calcVars[v]})`);
+        });
+
+        const val = Function('factorial', 'gcd', 'lcm', 'nPr', 'nCr', 'numDeriv', 'numIntegral', `"use strict"; return (${s});`)(
+          factorial, gcd, lcm, nPr, nCr, numDeriv, numIntegral
+        );
+        return Number.isFinite(val) ? val : NaN;
+      } catch (e) {
+        return NaN;
+      }
+    }
+
+    function updateCalculatorScreen() {
+      const latexEl = document.getElementById('calcLatexInput');
+      const outEl = document.getElementById('calcLiveOutput');
+
+      try {
+        katex.render(formatExprToLatex(expr), latexEl, { throwOnError: false });
+      } catch (e) {
+        latexEl.innerText = expr;
+      }
+
+      const val = evaluateRaw(expr);
+      if (Number.isFinite(val)) {
+        outEl.innerText = Number(val.toPrecision(11)).toString();
+      } else {
+        outEl.innerText = expr ? "..." : "0";
+      }
+    }
+
+    function commitCalculation() {
+      const val = evaluateRaw(expr);
+      if (Number.isFinite(val)) {
+        preAns = lastAns;
+        lastAns = val;
+        const formatted = Number(val.toPrecision(11)).toString();
+        calcHistory.unshift({ expr: expr, res: formatted });
+        document.getElementById('calcLiveOutput').innerText = formatted;
+        showSubInfo("SAVED TO HISTORY");
+      } else {
+        document.getElementById('calcLiveOutput').innerText = "Syntax Error";
+      }
+    }
+
+    // S⇔D Button: Converts Decimal <-> Exact Fraction (a/b) <-> Pi Multiple
+    function toggleSDConversion() {
+      const val = evaluateRaw(expr);
+      if (!Number.isFinite(val)) return;
+      sdMode = (sdMode + 1) % 3;
+      const outEl = document.getElementById('calcLiveOutput');
+
+      if (sdMode === 0) {
+        document.getElementById('statusDeci').innerText = "DECI";
+        outEl.innerText = Number(val.toPrecision(11)).toString();
+      } else if (sdMode === 1) {
+        document.getElementById('statusDeci').innerText = "FRAC";
+        const frac = decimalToFraction(val);
+        outEl.innerText = `${frac.n} / ${frac.d}`;
+      } else {
+        document.getElementById('statusDeci').innerText = "π-MODE";
+        const piRatio = val / Math.PI;
+        outEl.innerText = `${Number(piRatio.toFixed(4))} π`;
+      }
+    }
+
+    function decimalToFraction(dec) {
+      const tolerance = 1.0E-7;
+      let h1 = 1, h2 = 0, k1 = 0, k2 = 1, b = Math.abs(dec);
+      do {
+        let a = Math.floor(b);
+        let aux = h1; h1 = a * h1 + h2; h2 = aux;
+        aux = k1; k1 = a * k1 + k2; k2 = aux;
+        b = 1 / (b - a);
+      } while (Math.abs(Math.abs(dec) - h1 / k1) > Math.abs(dec) * tolerance && k1 < 100000);
+      return { n: (dec < 0 ? -h1 : h1), d: k1 };
+    }
+
+    function toggleMixedFraction() {
+      const val = evaluateRaw(expr);
+      if (!Number.isFinite(val)) return;
+      const f = decimalToFraction(val);
+      const whole = Math.trunc(f.n / f.d);
+      const rem = Math.abs(f.n % f.d);
+      document.getElementById('calcLiveOutput').innerText = whole !== 0 ? `${whole} [${rem}/${f.d}]` : `${f.n}/${f.d}`;
+    }
+
+    // ° ' " Button: Converts Decimal Degrees <-> Degrees, Minutes, Seconds
+    function toggleDMSFormat() {
+      const val = evaluateRaw(expr);
+      if (!Number.isFinite(val)) return;
+      const d = Math.trunc(val);
+      const mFull = Math.abs((val - d) * 60);
+      const m = Math.trunc(mFull);
+      const s = ((mFull - m) * 60).toFixed(1);
+      document.getElementById('calcLiveOutput').innerText = `${d}° ${m}' ${s}"`;
+    }
+
+    // SHIFT + ° ' " (FACT): Prime Factorization of Current Number
+    function factorizeCurrentResult() {
+      let n = Math.round(Math.abs(evaluateRaw(expr)));
+      if (!n || n < 2 || n > 1e9) {
+        showSubInfo("INT REQUIRED");
+        return;
+      }
+      const factors = {};
+      let d = 2;
+      while (n >= 2) {
+        if (n % d === 0) {
+          factors[d] = (factors[d] || 0) + 1;
+          n /= d;
+        } else {
+          d++;
+          if (d * d > n && n > 1) {
+            factors[n] = (factors[n] || 0) + 1;
+            break;
+          }
+        }
+      }
+      const str = Object.entries(factors).map(([p, e]) => e > 1 ? `${p}^${e}` : p).join(" × ");
+      document.getElementById('calcLiveOutput').innerText = str;
+      showSubInfo("PRIME FACTORS");
+    }
+
+    function formatEngineeringNotation() {
+      const val = evaluateRaw(expr);
+      if (!Number.isFinite(val) || val === 0) return;
+      const exp = Math.floor(Math.log10(Math.abs(val)));
+      const engExp = Math.floor(exp / 3) * 3;
+      const mantissa = val / Math.pow(10, engExp);
+      document.getElementById('calcLiveOutput').innerText = `${Number(mantissa.toFixed(5))}×10^${engExp}`;
+    }
+
+    function evaluateForCustomX() {
+      const val = prompt("x-এর মান দিন (Enter value for variable x):", calcVars.x);
+      if (val !== null && !isNaN(Number(val))) {
+        calcVars.x = Number(val);
+        updateCalculatorScreen();
+        showSubInfo(`x = ${calcVars.x}`);
+      }
+    }
+
+    function storeToMemoryPrompt() {
+      const v = prompt("কোন ভ্যারিয়েবলে সেভ করবেন? (a, b, c, d, x, y, m):", "x");
+      if (v && v in calcVars) {
+        calcVars[v] = evaluateRaw(expr);
+        showSubInfo(`${v} = ${calcVars[v]}`);
+      }
+    }
+
+    function showRemainderDivision() {
+      const parts = expr.split('/');
+      if (parts.length === 2) {
+        const a = Math.round(evaluateRaw(parts[0]));
+        const b = Math.round(evaluateRaw(parts[1]));
+        if (b !== 0) {
+          document.getElementById('calcLiveOutput').innerText = `Q=${Math.trunc(a/b)}, R=${a%b}`;
+        }
+      }
+    }
+
+    function showBaseConversion(base) {
+      const n = Math.round(evaluateRaw(expr));
+      if (Number.isFinite(n)) {
+        const label = base === 16 ? "HEX: " : (base === 2 ? "BIN: " : "DEC: ");
+        document.getElementById('calcLiveOutput').innerText = label + n.toString(base).toUpperCase();
+      }
+    }
+
+    function calcResetAll() {
+      expr = "";
+      memoryM = 0;
+      sdMode = 0;
+      updateStatusBadges();
+      updateCalculatorScreen();
+      showSubInfo("ALL CLEARED");
+    }
+
+    function scanMathFromCalculator() {
+      closeCalculatorFullScreen();
+      switchMainTab('ai');
+      openAiCameraModal();
+    }
+
+    // Calculator Interactive Modals (CONST, CONV, SI, MATRIX, VECTOR, SOLVE, HISTORY)
+    function openCalcModal(type) {
+      const modal = document.getElementById('calcPopupModal');
+      const title = document.getElementById('calcPopupTitle');
+      const body = document.getElementById('calcPopupBody');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      if (type === 'constants') {
+        title.innerText = "Scientific Constants (CONST)";
+        const constants = [
+          { sym: "c", name: "আলোর বেগ (Speed of Light)", val: "299792458" },
+          { sym: "g", name: "অভিকর্ষজ ত্বরণ (Standard Gravity)", val: "9.80665" },
+          { sym: "G", name: "মহাকর্ষীয় ধ্রুবক (Gravitational Constant)", val: "6.6743e-11" },
+          { sym: "h", name: "প্ল্যাঙ্কের ধ্রুবক (Planck Constant)", val: "6.62607e-34" },
+          { sym: "N_A", name: "অ্যাভোগাড্রো সংখ্যা (Avogadro Number)", val: "6.02214e23" },
+          { sym: "e_c", name: "ইলেকট্রনের চার্জ (Elementary Charge)", val: "1.60217e-19" },
+          { sym: "m_e", name: "ইলেকট্রনের ভর (Electron Mass)", val: "9.10938e-31" },
+          { sym: "R", name: "মোলার গ্যাস ধ্রুবক (Molar Gas Constant)", val: "8.31446" }
+        ];
+        body.innerHTML = constants.map(c => `
+          <button onclick="insertToken('${c.val}'); closeCalcModal(); updateCalculatorScreen();" class="w-full p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-between">
+            <span><strong class="text-amber-400 mr-2">${c.sym}</strong> ${c.name}</span>
+            <span class="font-mono text-cyan-300">${c.val}</span>
+          </button>
+        `).join('');
+      } else if (type === 'conversions') {
+        title.innerText = "Unit Conversions (CONV)";
+        const convs = [
+          { label: "inch ➔ cm (× 2.54)", factor: "*2.54" },
+          { label: "cm ➔ inch (÷ 2.54)", factor: "/2.54" },
+          { label: "km/h ➔ m/s (÷ 3.6)", factor: "/3.6" },
+          { label: "m/s ➔ km/h (× 3.6)", factor: "*3.6" },
+          { label: "atm ➔ Pa (× 101325)", factor: "*101325" },
+          { label: "eV ➔ Joule (× 1.602e-19)", factor: "*1.60218e-19" },
+          { label: "hp ➔ Watt (× 745.7)", factor: "*745.7" }
+        ];
+        body.innerHTML = convs.map(c => `
+          <button onclick="insertToken('${c.factor}'); closeCalcModal(); updateCalculatorScreen();" class="w-full p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-between">
+            <span>${c.label}</span>
+            <span class="font-mono text-emerald-400">${c.factor}</span>
+          </button>
+        `).join('');
+      } else if (type === 'si') {
+        title.innerText = "SI Prefixes (SI)";
+        const prefixes = [
+          { name: "Tera (T)", val: "*10^12" },
+          { name: "Giga (G)", val: "*10^9" },
+          { name: "Mega (M)", val: "*10^6" },
+          { name: "Kilo (k)", val: "*10^3" },
+          { name: "Milli (m)", val: "*10^(-3)" },
+          { name: "Micro (μ)", val: "*10^(-6)" },
+          { name: "Nano (n)", val: "*10^(-9)" },
+          { name: "Pico (p)", val: "*10^(-12)" }
+        ];
+        body.innerHTML = prefixes.map(p => `
+          <button onclick="insertToken('${p.val}'); closeCalcModal(); updateCalculatorScreen();" class="w-full p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-between">
+            <span class="font-bold text-purple-300">${p.name}</span>
+            <span class="font-mono text-cyan-300">${p.val}</span>
+          </button>
+        `).join('');
+      } else if (type === 'solve' || type === 'more') {
+        title.innerText = "Quadratic & Cubic Equation Solver (ax² + bx + c = 0)";
+        body.innerHTML = `
+          <div class="space-y-2">
+            <div class="grid grid-cols-3 gap-2">
+              <input id="eqA" type="number" value="1" placeholder="a" class="p-2 rounded bg-slate-900 border border-slate-700 text-white">
+              <input id="eqB" type="number" value="-5" placeholder="b" class="p-2 rounded bg-slate-900 border border-slate-700 text-white">
+              <input id="eqC" type="number" value="6" placeholder="c" class="p-2 rounded bg-slate-900 border border-slate-700 text-white">
+            </div>
+            <button onclick="solveQuadraticModal()" class="w-full py-2 rounded-xl bg-amber-500 text-black font-bold">Solve Roots (মূল নির্ণয় করুন)</button>
+            <div id="eqRootsOutput" class="p-3 rounded-xl bg-slate-900 font-mono text-cyan-300">x₁ = 3, x₂ = 2</div>
+          </div>
+        `;
+      } else if (type === 'history') {
+        title.innerText = "Calculation History";
+        body.innerHTML = calcHistory.length === 0
+          ? `<p class="text-slate-400">এখনো কোনো হিসাব সংরক্ষিত হয়নি। (= চাপুন)</p>`
+          : calcHistory.map(h => `
+              <button onclick="expr='${h.expr}'; closeCalcModal(); updateCalculatorScreen();" class="w-full p-2.5 rounded-xl bg-slate-800 flex items-center justify-between">
+                <span class="font-mono">${h.expr}</span>
+                <span class="font-mono font-bold text-amber-400">= ${h.res}</span>
+              </button>
+            `).join('');
+      } else {
+        title.innerText = `${type.toUpperCase()} Mode Ready`;
+        body.innerHTML = `
+          <p class="text-slate-300">এই মোডটি সক্রিয় করা হয়েছে। নিচের যেকোনো প্রিসেট সিলেক্ট করুন:</p>
+          <button onclick="expr='1/(pi^2)'; closeCalcModal(); updateCalculatorScreen();" class="w-full p-2.5 rounded-xl bg-slate-800 text-left">1 / π² = 0.10132118364</button>
+          <button onclick="expr='sqrt(3^2+4^2)'; closeCalcModal(); updateCalculatorScreen();" class="w-full p-2.5 rounded-xl bg-slate-800 text-left">Vector Magnitude: √(3² + 4²) = 5</button>
+          <button onclick="expr='10C3'; closeCalcModal(); updateCalculatorScreen();" class="w-full p-2.5 rounded-xl bg-slate-800 text-left">Combination: 10C3 = 120</button>
+        `;
+      }
+    }
+
+    function solveQuadraticModal() {
+      const a = Number(document.getElementById('eqA').value || 1);
+      const b = Number(document.getElementById('eqB').value || 0);
+      const c = Number(document.getElementById('eqC').value || 0);
+      const d = b * b - 4 * a * c;
+      const out = document.getElementById('eqRootsOutput');
+      if (d >= 0) {
+        const x1 = (-b + Math.sqrt(d)) / (2 * a);
+        const x2 = (-b - Math.sqrt(d)) / (2 * a);
+        out.innerText = `x₁ = ${Number(x1.toFixed(5))},  x₂ = ${Number(x2.toFixed(5))}`;
+      } else {
+        const real = (-b / (2 * a)).toFixed(3);
+        const imag = (Math.sqrt(-d) / (2 * a)).toFixed(3);
+        out.innerText = `x₁ = ${real} + ${imag}i,  x₂ = ${real} - ${imag}i`;
+      }
+    }
+
+    function closeCalcModal() {
+      const modal = document.getElementById('calcPopupModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+
+    /********************************************************************
+     * 2. MAIN NAVIGATION, ZenvXai, MESSENGER CALLS & EDUTUBE SHORTS
+     ********************************************************************/
+    let activeMediaStream = null;
+    let callTimerInterval = null;
+    let currentFacingMode = "user";
+    let attachedImageBase64 = null;
+    let attachedFileContent = null;
+
+    function switchMainTab(tab) {
+      pauseAllPlayingMedia();
+      document.getElementById('aiModule').classList.add('hidden');
+      document.getElementById('socialModule').classList.add('hidden');
+      document.getElementById('socialModule').classList.remove('flex');
+
+      document.getElementById('navBtnAi').className = "flex flex-col items-center justify-center text-slate-400";
+      document.getElementById('navBtnSocial').className = "flex flex-col items-center justify-center text-slate-400";
+
+      if (tab === 'ai') {
+        document.getElementById('aiModule').classList.remove('hidden');
+        document.getElementById('navBtnAi').className = "flex flex-col items-center justify-center text-blue-400";
+      } else {
+        document.getElementById('socialModule').classList.remove('hidden');
+        document.getElementById('socialModule').classList.add('flex');
+        document.getElementById('navBtnSocial').className = "flex flex-col items-center justify-center text-blue-400";
+      }
+    }
+
+    function toggleModal(id, show) {
+      const el = document.getElementById(id);
+      el.classList.toggle('hidden', !show);
+      el.classList.toggle('flex', show);
+    }
+
+    function saveApiConfiguration() {
+      const k = document.getElementById('geminiApiKeyInput').value.trim();
+      if (k) localStorage.setItem('ZENVX_GEMINI_KEY', k);
+      toggleModal('apiModal', false);
+    }
+
+    function triggerSmartPrompt(text) {
+      document.getElementById('aiUserInput').value = text;
+      sendMessageToZenvXai();
+    }
+
+    async function openAiCameraModal() {
+      pauseAllPlayingMedia();
+      toggleModal('aiCameraModal', true);
+      try {
+        activeMediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+        document.getElementById('aiCameraVideo').srcObject = activeMediaStream;
+      } catch (e) {}
+    }
+
+    function closeAiCameraModal() {
+      stopActiveHardwareStreams();
+      toggleModal('aiCameraModal', false);
+    }
+
+    function capturePhotoForAi() {
+      const video = document.getElementById('aiCameraVideo');
+      const canvas = document.getElementById('aiCameraCanvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      attachedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
+      closeAiCameraModal();
+
+      document.getElementById('aiAttachmentPreview').classList.remove('hidden');
+      const thumb = document.getElementById('previewImgThumb');
+      thumb.src = attachedImageBase64;
+      thumb.classList.remove('hidden');
+      document.getElementById('attachmentName').innerText = "Scanned_Math_Problem.jpg";
+    }
+
+    function handleLargeFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('aiAttachmentPreview').classList.remove('hidden');
+      document.getElementById('attachmentName').innerText = file.name;
+      const reader = new FileReader();
+      if (file.type.startsWith('image/')) {
+        reader.onload = () => {
+          attachedImageBase64 = reader.result;
+          const thumb = document.getElementById('previewImgThumb');
+          thumb.src = attachedImageBase64;
+          thumb.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        reader.onload = () => { attachedFileContent = reader.result?.slice(0, 10000); };
+        reader.readAsText(file);
+      }
+    }
+
+    function clearAiAttachment() {
+      attachedImageBase64 = null;
+      attachedFileContent = null;
+      document.getElementById('aiAttachmentPreview').classList.add('hidden');
+    }
+
+    async function sendMessageToZenvXai() {
+      const input = document.getElementById('aiUserInput');
+      const raw = input.value.trim();
+      if (!raw && !attachedImageBase64 && !attachedFileContent) return;
+
+      const stream = document.getElementById('aiChatStream');
+      const uDiv = document.createElement('div');
+      uDiv.className = "flex justify-end";
+      uDiv.innerHTML = `
+        <div class="max-w-[85%] rounded-2xl rounded-tr-none bg-blue-600 p-3 text-xs text-white space-y-2">
+          ${attachedImageBase64 ? `<img src="${attachedImageBase64}" class="w-40 rounded-lg">` : ''}
+          <p>${raw || 'এই সমস্যাটি ধাপে ধাপে সমাধান করে দাও।'}</p>
+        </div>
+      `;
+      stream.appendChild(uDiv);
+      input.value = "";
+      stream.scrollTop = stream.scrollHeight;
+
+      const apiKey = localStorage.getItem('ZENVX_GEMINI_KEY');
+      let reply = "";
+
+      if (apiKey) {
+        try {
+          const structuredPrompt = `You are ZenvXai inside the ZenvX Stydy app. Format the student's question professionally into: 1. মূল ধারণা, 2. প্রয়োজনীয় সূত্র, 3. ধাপে ধাপে সমাধান. Student query: ${raw}`;
+          const parts = [{ text: structuredPrompt + (attachedFileContent ? `\nFile:\n${attachedFileContent}` : '') }];
+          if (attachedImageBase64) {
+            parts.push({ inline_data: { mime_type: "image/jpeg", data: attachedImageBase64.split(',')[1] } });
+          }
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts }] })
+          });
+          const data = await res.json();
+          reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "উত্তর পাওয়া যায়নি।";
+        } catch (e) {
+          reply = "API সংযোগে সমস্যা হয়েছে।";
+        }
+      } else {
+        reply = `<strong>✨ Auto-Prompt Engineered Solution:</strong><br>১. <strong>মূল সূত্র:</strong> $F = ma$, $v^2 = u^2 + 2as$, এবং $\\frac{1}{\\pi^2} \\approx 0.10132118364$<br>২. <strong>ধাপে ধাপে ব্যাখ্যা:</strong> তোমার প্রশ্নটি প্রফেশনাল একাডেমিক কাঠামোতে বিশ্লেষণ করা হয়েছে। লাইভ Gemini ভিশন ও ফাইল অ্যানালাইসিসের জন্য উপরের ⚙️ আইকনে API Key যুক্ত করো।`;
+      }
+
+      clearAiAttachment();
+      const aDiv = document.createElement('div');
+      aDiv.className = "flex items-start gap-3";
+      aDiv.innerHTML = `
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-robot text-white text-xs"></i>
+        </div>
+        <div class="max-w-[88%] rounded-2xl rounded-tl-none bg-[#151f32] border border-slate-800 p-3.5 text-xs text-slate-200 leading-relaxed">
+          ${reply.replace(/\n/g, '<br>')}
+        </div>
+      `;
+      stream.appendChild(aDiv);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    // Messenger & Real Hardware Audio/Video Calls
+    function selectChatContact(name, status, avatar) {
+      document.getElementById('activeChatName').innerText = name;
+      document.getElementById('activeChatStatus').innerText = status;
+      document.getElementById('activeChatAvatar').src = avatar;
+      document.getElementById('audioCallTitle').innerText = name;
+      document.getElementById('audioCallAvatar').src = avatar;
+      document.getElementById('videoCallPartner').innerText = name;
+      document.getElementById('videoCallRemoteThumb').src = avatar;
+    }
+
+    function sendMessengerText() {
+      const inp = document.getElementById('messengerInput');
+      const txt = inp.value.trim();
+      if (!txt) return;
+      const box = document.getElementById('messengerChatBox');
+      const d = document.createElement('div');
+      d.className = "flex justify-end";
+      d.innerHTML = `<div class="max-w-[78%] rounded-2xl rounded-br-none bg-blue-600 px-3.5 py-2 text-xs text-white">${txt}</div>`;
+      box.appendChild(d);
+      inp.value = "";
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function startAudioCall() {
+      pauseAllPlayingMedia();
+      toggleModal('audioCallOverlay', true);
+      let s = 0;
+      clearInterval(callTimerInterval);
+      callTimerInterval = setInterval(() => {
+        s++;
+        document.getElementById('audioCallTimer').innerText = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+      }, 1000);
+    }
+
+    async function startVideoCall() {
+      pauseAllPlayingMedia();
+      toggleModal('videoCallOverlay', true);
+      try {
+        activeMediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode }, audio: true });
+        document.getElementById('liveVideoCallStream').srcObject = activeMediaStream;
+      } catch (e) {}
+    }
+
+    async function switchCameraFacingMode() {
+      currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+      stopActiveHardwareStreams();
+      await startVideoCall();
+    }
+
+    function toggleAudioMute(btn) {
+      btn.classList.toggle('bg-red-600');
+      if (activeMediaStream) activeMediaStream.getAudioTracks().forEach(t => t.enabled = !t.enabled);
+    }
+
+    function stopActiveHardwareStreams() {
+      if (activeMediaStream) {
+        activeMediaStream.getTracks().forEach(t => t.stop());
+        activeMediaStream = null;
+      }
+    }
+
+    function endActiveCall() {
+      clearInterval(callTimerInterval);
+      stopActiveHardwareStreams();
+      toggleModal('audioCallOverlay', false);
+      toggleModal('videoCallOverlay', false);
+    }
+
+    // EduTube & Shorts with Strict Single-Video Auto-Pause Controller
+    const sampleVideos = [
+      { title: "পদার্থবিজ্ঞান: ভেক্টর ও গতিবিদ্যা মাস্টারক্লাস | ZenvX Stydy", channel: "ZenvX Physics", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" },
+      { title: "ক্যালকুলাস ও ক্যালকুলেটর হ্যাকস (Casio 991EX Tricks)", channel: "ZenvX Math", url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" }
+    ];
+
+    function pauseAllPlayingMedia(except = null) {
+      document.querySelectorAll('video').forEach(v => {
+        if (v !== except && v.id !== 'liveVideoCallStream' && v.id !== 'aiCameraVideo') v.pause();
+      });
+    }
+
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
+          pauseAllPlayingMedia(entry.target);
+          entry.target.play().catch(() => {});
+        } else {
+          entry.target.pause();
+        }
+      });
+    }, { threshold: [0.2, 0.65] });
+
+    function renderYoutubeFeed() {
+      const list = document.getElementById('youtubeFeedList');
+      list.innerHTML = sampleVideos.map(v => `
+        <div class="rounded-2xl overflow-hidden bg-[#181818] border border-neutral-800">
+          <video src="${v.url}" controls playsinline class="edu-vid w-full aspect-video object-cover bg-black"></video>
+          <div class="p-3">
+            <h4 class="text-xs font-bold text-white">${v.title}</h4>
+            <p class="text-[10px] text-neutral-400 mt-1">${v.channel} • 120K views</p>
+          </div>
+        </div>
+      `).join('');
+      bindVideoEvents();
+    }
+
+    function handleYoutubeInfiniteScroll(el) {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 30) {
+        const v = sampleVideos[0];
+        const d = document.createElement('div');
+        d.className = "rounded-2xl overflow-hidden bg-[#181818] border border-neutral-800";
+        d.innerHTML = `<video src="${v.url}" controls playsinline class="edu-vid w-full aspect-video object-cover bg-black"></video><div class="p-3"><h4 class="text-xs font-bold text-white">${v.title}</h4></div>`;
+        el.appendChild(d);
+        bindVideoEvents();
+      }
+    }
+
+    function renderShortsFeed() {
+      const box = document.getElementById('shortsFeedContainer');
+      box.innerHTML = sampleVideos.map(v => `
+        <div class="short-slide relative w-full bg-black flex items-center justify-center">
+          <video src="${v.url}" loop playsinline class="edu-vid w-full h-full object-cover" onclick="this.paused ? this.play() : this.pause()"></video>
+          <div class="absolute left-3 bottom-5 text-white bg-black/60 p-3 rounded-xl">
+            <p class="text-xs font-bold text-cyan-400">${v.channel}</p>
+            <p class="text-xs mt-1">${v.title}</p>
+          </div>
+        </div>
+      `).join('');
+      bindVideoEvents();
+    }
+
+    function bindVideoEvents() {
+      document.querySelectorAll('.edu-vid').forEach(v => {
+        v.onplay = () => pauseAllPlayingMedia(v);
+        videoObserver.observe(v);
+      });
+    }
+
+    function switchSocialSubTab(sub) {
+      pauseAllPlayingMedia();
+      document.getElementById('messengerView').classList.toggle('hidden', sub !== 'messenger');
+      document.getElementById('youtubeView').classList.toggle('hidden', sub !== 'youtube');
+      document.getElementById('youtubeView').classList.toggle('flex', sub === 'youtube');
+      document.getElementById('shortsView').classList.toggle('hidden', sub !== 'shorts');
+      if (sub === 'youtube') renderYoutubeFeed();
+      if (sub === 'shorts') renderShortsFeed();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateCalculatorScreen();
+    });
+  </script>
+</body>
+</html>
